@@ -1,0 +1,13 @@
+.canvasContainer
+{
+	background-color: #aaa;
+}
+
+#joystick
+{
+	float: left;
+}
+#speedJoystick
+{
+	float: right;
+}

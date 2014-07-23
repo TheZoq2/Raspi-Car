@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src='js/socket.js'></script>
+		<script src="js/ui.js"></script>
+		<script src="js/joystick.js"></script>
+		<script src="js/robot.js"></script>
+
+		<link rel="stylesheet" href="css/cssreset.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	
+	<body>
+		
+		<canvas id="joystick" width="400" height="500"></canvas>
+
+
+		<canvas id="speedJoystick" width="400" height="500"></canvas>
+
+		
+		<script>
+			setupSocket();
+			setupUI();
+			setupRobot();
+		</script>
+	</body>	
+</html>
