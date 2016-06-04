@@ -5,7 +5,6 @@ import tornado.websocket
 import string
 import time
 import os
-import RPi.GPIO as GPIO
 from subprocess import call
 
 #defining some variables
@@ -21,7 +20,7 @@ forwardDuty = 10
 backwardDuty = 5
 
 #for servoblaster PWM
-servodPath = "/home/frans/Documents/servoblaster/servoblaster/user/servod"
+servodPath = "/home/frans/Documents/PiBits/ServoBlaster/user/servod"
 servodWritePath = "/dev/servoblaster"
 leftPulse = 1000 #in prorcent
 neutralPulse = 1500
@@ -34,56 +33,15 @@ dirServoID = 1;
 
 freq = 50
 
-#Setting up GPIO
-#GPIO.setmode(GPIO.BCM)
-
-#GPIO.setup(steeringPin, GPIO.OUT)
-#GPIO.setup(motorPin, GPIO.OUT)
-
-#steeringPWM = GPIO.PWM(steeringPin, freq)
-#motorPWM = GPIO.PWM(motorPin, freq)
-
 #Used to parse a message 
-def parseMessage(message):
-    #print("Parsing message");
-    colonPos = string.find(message, ":")
-
-    variable = []
-
-    variable.append(message[0:colonPos])
-    variable.append(message[colonPos + 1:])
-
-    return variable;
-
-
-def setDuty(amount):
-    duty = 0
-    if(amount == 0.5):
-        duty = neutralDuty
-    if(amount > 0.5 and amount <= 1):
-        dutyDiff = rightDuty - neutralDuty
-        duty = neutralDuty + dutyDiff * amount - 0.5
-    if(amount < 0.5 and amount >= 0):
-        dutyDiff = neutralDuty - leftDuty
-        duty = leftDuty + dutyDiff * amount
-
-    steeringPWM.ChangeDutyCycle(duty)
 
 def setWheelPWM(amount):
     pulse = 0
-#    if(amount == 0.5):
-#        pulse = neutralPulse
-#    if(amount > 0.5 and amount <= 1):
-#        pulseDiff = rightPulse - neutralPulse
-#        pulse = neutralPulse + pulseDiff * amount - 0.5
-#    if(amount < 0.5 and amount >= 0):
-#        pulseDiff = neutralPulse - leftPulse
-#        pulse = leftPulse + pulseDiff * amount*/
-    pulse = 0;
     if(amount >= 0 and amount <= 1):
         pulseDiff = rightPulse - leftPulse
         pulse = leftPulse + pulseDiff * amount
 
+    print("Chanaging turn direction to {}", amount);
     #setting the pulse
     #call("echo 1=&fus > /dev/servoblaster" % pulse)
     os.system("echo %i=%fus > /dev/servoblaster" % (steerServoID, pulse))
@@ -94,6 +52,7 @@ def setDir(value):
         pulse = forwardPulse
     if value < 0.5:
         pulse = backwardPulse
+
 
     driveString = "echo %i=%fus > /dev/servoblaster" % (dirServoID, pulse)
     #print driveString
@@ -109,7 +68,7 @@ class SocketHandler(tornado.websocket.WebSocketHandler):
         print(message)
 
         #parse the message
-        parsedMsg = parseMessage(message)
+        parsedMsg = message.split(":")
         
         if(parsedMsg[0] == "driveDir"):
             value = float(parsedMsg[1])
@@ -147,15 +106,8 @@ class Files(tornado.web.RequestHandler):
         self.write(File.read())
         File.close()
 
-#Setting up
-#Open a GPIO port
-#GPIO.SetMode
-
 
 try:
-    #Starting the steering
-    #steeringPWM.start(leftDuty)
-
     #Start the servo program
     os.system("sudo %s --p1pins=16,18" % servodPath)
 
@@ -174,9 +126,5 @@ except KeyboardInterrupt:
 #cleanup
 os.system("echo 0=0us > /dev/servoblaster")
 os.system("echo 1=0us > /dev/servoblaster")
-#steeringPWM.ChangeDutyCycle(neutralDuty)
-
-#motorPWM.stop()
-#steeringPWM.stop()
 
 print("Exiting server")

@@ -2,7 +2,7 @@ var connection;
 
 function setupSocket()
 {
-	var ip = 'ws://192.168.1.77:8888/websocket'
+	var ip = 'ws://192.168.0.102:8888/websocket'
 	connection = new WebSocket(ip, ['soap', 'xmpp']);
 
 	connection.onopen = function()
